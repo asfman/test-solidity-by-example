@@ -1,0 +1,14 @@
+node_modules
+.env
+coverage
+coverage.json
+typechain
+typechain-types
+*.swp
+
+#Hardhat files
+cache
+artifacts
+console*.txt
+
+
