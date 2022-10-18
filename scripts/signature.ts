@@ -1,4 +1,6 @@
 import { ethers } from "hardhat";
+import { hexDataSlice } from "@ethersproject/bytes";
+import { id } from "@ethersproject/hash";
 
 async function main() {
   // 0xc0457f922BD307A49C9A2364677E3cB3C6EC982A
@@ -48,7 +50,13 @@ async function main() {
       "function getMessageHash(address _to, uint _amount, string memory _message, uint _nonce)"
     ];
     let iface = new ethers.utils.Interface(ABI);
+    //encodeFUnctionData: 1. this.getSighash(this.getFunction(functionFragment)) 2. this._abiCoder.encode(params, values): new ethers.utils.AbiCoder().encode(["uint", "address"], [123, owner.address])
+    //calldat == abi.encodeWithSignature("transfer(address,uint256)", to, amount) == encodeFUnctionData("transfer", [owner.address, 888]);
     callData = iface.encodeFunctionData("getMessageHash", [from, 888, "asfman", 123]);
+    // let fragment = iface.getFunction("getMessageHash");
+    // console.log(fragment.format());
+    // console.log("getSighash ", iface.getSighash(fragment))
+    // console.log("hexDataSlice(id(text)) ", hexDataSlice(id("getMessageHash(address,uint256,string,uint256)"), 0, 4));
     // console.log(callData);
     let tx = {
       nonce,
