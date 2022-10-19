@@ -1,15 +1,6 @@
-## cancel pending transaction
+## solidity
 
-```shell
-const tx = {
-  nonce: nonceOfPendingTx,
-  to: ethers.constants.AddressZero,
-  data: '0x',
-  gasPrice: gasPriceHigherThanPendingTx
-}; // costs 21000 gas
-signer.sendTransaction(tx);
-```
-## bytes to hex char
+### bytes to hex char
 
 ```shell
 function uint8tohexchar(uint8 i) public pure returns (uint8) {
@@ -44,13 +35,13 @@ function bytes4ToHex(bytes4 bb)
 }
 ```
 
-## bytes to address
+### bytes to address
 
 ```shell
  address(uint160(uint(bytes32(data)))))
 ```
 
-## get function selector
+### get function selector
 
 1. direct use keccak256
 ```shell
@@ -64,9 +55,9 @@ bytes4 selector = this.getSelector("xxx(uint256,address)");
 Contract.func.selector
 ```
 
-## contract call
+### contract call
 
-### 无状态读取用address.staticcall(bytes), 否者用address.call(bytes)
+#### 无状态读取用address.staticcall(bytes), 否者用address.call(bytes)
 1. abi.encodeWithSignature
 等同于在abi.encode()参数后, 编码结果前加上了bytes4(keccak256(bytes(_func)))返回的4字节的函数选择器
 ```shell
@@ -128,12 +119,12 @@ contract Callee {
 const ABI = ["function take(string calldata _secrect) external"]
 const contract = new ethers.utils.Contract(calleeAddress, ABI, wallet)
 ```
-#### direct use contract.func
+#### 1. direct use contract.func
 ```shell
 await contract.take("")
 ```
 
-#### use sendTransaction
+#### 2. use sendTransaction
 signer.sendTransaction:
 1. wallet.signTransaction(tx)
 2. provider.sendTransaction(signedTx)
@@ -146,7 +137,7 @@ await signer.sendTransaction({
     data: calldata
 })
 ```
-#### use eth_sendRawTransaction
+#### 3. use eth_sendRawTransaction
 ```shell
 const gasLimit = 680333
 const gasPrice = ethers.utils.parseUnits("10", "gwei")
@@ -165,15 +156,26 @@ await ethers.provider.sendTransaction(signedTx)
 
 ### contract static call
 
-#### direct use contract.func
+#### 1. direct use contract.func
 ```shell
 await contract.take("")
 ```
 
-#### use eth_call
+#### 2. use eth_call
 类似于：curl -X POST --data '{"jsonrpc":"2.0","method":"eth_call","params":[{"to": "0xa5F8a1FcdB4b36", "data": "0xa35f8a4000007"}, "latest"],"id":1}' https://xxx
 ```shell
 const iface = new ethers.utils.Interface(ABI)
 const calldata = iface.encodeFunctionData("take", ["asfman"])
 await ethers.provider.send("eth_call", [{to: contract.address, data: calldata}, "latest"]))
+```
+### cancel pending transaction
+
+```shell
+const tx = {
+  nonce: nonceOfPendingTx,
+  to: ethers.constants.AddressZero,
+  data: '0x',
+  gasPrice: gasPriceHigherThanPendingTx
+}; // costs 21000 gas
+signer.sendTransaction(tx);
 ```
