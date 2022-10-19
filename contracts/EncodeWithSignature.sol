@@ -10,7 +10,7 @@ contract Caller {
         console.log("getMessageHash: ", bytes4ToHex(this.getSelector("getMessageHash(address, uint256, string, uint256)")));
         console.log("bytes4(keccak256(bytes(\"fk()\"))): %s", bytes4ToHex(this.getSelector("fk()")));
         console.log("Callee.fk.selector: %s", bytes4ToHex(Callee.fk.selector));
-        (bool success, bytes memory data) = callee.call(
+        (bool success, bytes memory data) = callee.staticcall(
             // abi.encode(this.getSelector("fk()"))
             // Callee.fk.selector equal this.getSelector("fk()") 
             abi.encode(Callee.fk.selector)
@@ -38,8 +38,12 @@ contract Caller {
 
     function callwithargs(address callee) public {
         bytes4 selector = this.getSelector("fkwithargs(uint256)");
+        console.log("getSelector ", bytes4ToHex(selector));
+
         (bool success, ) = callee.call(
-            // equal to abi.encodeWithSignature("fkwithargs(uint256", 1)
+            // abi.encodeWithSignature("fkwithargs(uint256)", 1) 等同于在 abi.encode(1) 编码结果前加上了 4 字节的函数选择器
+            // 与 abi.encodeWithSignature 功能类似，只不过第一个参数为函数选择器，为函数签名 Keccak 哈希的前 4 个字节
+            // abi.encodeWithSelector(Callee.fkwithargs.selector, 1)
             // must use uint256 not uint
 
             abi.encode(selector, 1)
